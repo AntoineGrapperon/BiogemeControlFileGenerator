@@ -49,12 +49,9 @@ public class DataPreparator {
 	
 	public void processData(int choiceSetSize) throws IOException{
 		storeData();
-		
-		System.out.println("-- min and max distance for a trip processed");
-		processAlternatives(choiceSetSize);// maybe some work should be done to avoid to get alternatives irrelevant (like not taking PT, or for a different kind of occupation)
-		System.out.println("--alternative processed");
-		
-		
+		//all data processing required should be implemented in separate functions and runned here
+		generateChoiceSetBySamplingClosestAlternatives(choiceSetSize);
+		processDummies();
 		selectAndPrint(choiceSetSize);
 	}
 	
@@ -74,10 +71,9 @@ public class DataPreparator {
 		return hour; //here, hour is in minutes
 	}
 	
-
-	
-	public void processAlternatives(int n){
-		for(int i = 0; i < n; i++){
+	//thisose function is an example based on panel data. Each agent was sampled and gave various number of answer, each answer resulting in a row
+	public void generateChoiceSetBySamplingClosestAlternatives(int n){
+		/*for(int i = 0; i < n; i++){
 			myData.put(Dictionnary.firstDep+Integer.toString(i), new ArrayList<Object>());
 			myData.put(Dictionnary.lastDep+Integer.toString(i), new ArrayList<Object>());
 			myData.put(Dictionnary.fidelPtRange+Integer.toString(i), new ArrayList<Object>());
@@ -103,9 +99,9 @@ public class DataPreparator {
 			if(i%1000==0){
 				System.out.println(i);
 			}
-		}
+		}*/
 	}
-
+	/*
 	private void addAlternatives(int n) {
 		// TODO Auto-generated method stub
 		for(int i = 0; i < n; i++){
@@ -184,7 +180,7 @@ public class DataPreparator {
 		answer[0] = curId;
 		answer[1] = curDist;
 		return answer;
-	}
+	}*/
 
 	
 	public void storeData() throws IOException
@@ -316,9 +312,15 @@ public class DataPreparator {
 		}
 	}
 	
+	
+	/* 
+	 * If dataset contains a lot of data and you wish to generate a choice set by sampling closest alternative
+	 * you may find interesting to use multithreading to accelerate computation. 
+	 * CAREFUL: by operating multithreading you divide the data and operate in each sub dataset therefore
+	 *  speed increase, but you are sampling only in the sub dataset and not from the whole dataset.
+	 */
 	public ArrayList<Object> createSubSamples(int numberOfCores){
 
-	    //creates sub group of zone that can be processed using multithreading to accelerate computation
 	    int subSampleSize = myData.get(Dictionnary.id).size()/(numberOfCores);
 	    ArrayList<Object> subSamples = new ArrayList<Object>();
 	    int idxCore = 0;
@@ -362,22 +364,22 @@ public class DataPreparator {
     {
 		String workingDir = System.getProperty("user.dir");
 		ControlFileGenerator biogemeGenerator = new ControlFileGenerator();
-    	biogemeGenerator.generateBiogemeControlFile(pathControleFile, pathOutput, pathHypothesis);
+    	biogemeGenerator.initialize(pathControleFile, pathOutput, pathHypothesis);
+    	biogemeGenerator.generateCombinations();
     	HashMap<String,Integer> dictionnary = biogemeGenerator.getCombinationTable();
-    	
     	
 		storeData();
 
 		//Here should be all the function that you will have developped to prepare your dataset (for instance here : 
 		// process departure hours in three categories: before peak, during peak and after peak
-		departureHour3categories();
-		lastDepartureHour3categories();
-		System.out.println("--categories for departure hours were processed");
+		//departureHour3categories();
+		//lastDepartureHour3categories();
 		
-		processChoice(dictionnary, biogemeGenerator.order);
+		identifyChoiceMade(dictionnary, biogemeGenerator.order);
+		
+		processDummies();
 		
 	    ArrayList<Object> subSamples = createSubSamples(numberOfCores);
-	    System.out.println("--data batched and ready for multithreading");
 	    //create and run multiple threads
 	    ExecutorService cores = Executors.newFixedThreadPool(numberOfCores);
     	Set<Future<HashMap<String,ArrayList<Object>>>> set = new HashSet<Future<HashMap<String,ArrayList<Object>>>>();
@@ -408,25 +410,131 @@ public class DataPreparator {
     	catch (InterruptedException | ExecutionException ex) {
     		ex.printStackTrace(); 
     	}
-    	
-    	System.out.println("--alternatives processed");
-		
-		/*processDummies();
-		System.out.println("-- dummies processed");
-		
-		nActivitiesSimulation();
-		System.out.println("--number of activities were simulated");
-		ptFidelitySimulation();
-		System.out.println("--pt fidelity simulated");
-		firstDepartureSimulation();
-		System.out.println("--first departure simulated");
-		lastDepartureSimulation();
-		System.out.println("--last departure simulated");*/
-		
+
 		
 		selectAndPrint(nAlternatives);
 		cores.shutdown();
     }
+	
+	
+	
+	
+	/*public void departureHour3categories(){
+		myData.put(Dictionnary.firstDep + "Short", new ArrayList());
+		for(int i = 0; i < myData.get(Dictionnary.id).size(); i++){
+			String temp = (String) myData.get(Dictionnary.firstDep).get(i);
+			if(temp.equals("1")){myData.get(Dictionnary.firstDep+ "Short").add("0");} //living earlier then peak hour
+			else if (temp.equals("2")){myData.get(Dictionnary.firstDep+ "Short").add("1");} // leaving during peak hour (6-9am)
+			else if (temp.equals("10")){myData.get(Dictionnary.firstDep+ "Short").add("10");}
+			else {myData.get(Dictionnary.firstDep+ "Short").add("2");} 
+		}
+	}
+	
+	public void lastDepartureHour3categories(){
+		myData.put(Dictionnary.lastDep + "Short", new ArrayList());
+		
+		for(int i = 0; i < myData.get(Dictionnary.id).size(); i++){
+			int hour = Integer.parseInt((String)myData.get(Dictionnary.lastDep).get(i));
+			if(hour<1530){myData.get(Dictionnary.lastDep+ "Short").add("0");}
+			else if(hour < 1830){myData.get(Dictionnary.lastDep+ "Short").add("1");}
+			else if (hour >=1830){myData.get(Dictionnary.lastDep+ "Short").add("2");}
+			else{myData.get(Dictionnary.lastDep + "Short").add("10");}
+		}
+	}*/
+
+	
+	
+	
+	public int antitheticDrawMNL(ArrayList<Double> utilities){
+		ArrayList<Double> exponentials = new ArrayList<Double>();
+		double denominator = 0;
+		for(Double u : utilities){
+			double expU = Math.exp(u);
+			exponentials.add(expU);
+			denominator += expU;
+		}
+		ArrayList<Double> cumulativeProbabilities = new ArrayList<Double>();
+		double cumul = 0;
+		for(Double eU : exponentials){
+			cumul += eU;
+			cumulativeProbabilities.add(cumul/denominator);
+		}
+		
+		double randVal = randGen.NextDoubleInRange(0, 1);
+		int index =0;
+		for(int i =0; i<cumulativeProbabilities.size(); i++){
+			if(randVal>cumulativeProbabilities.get(i)){
+			}
+			else{
+				index = i;
+				i+=1000;
+			}
+		}
+		//System.out.println(utilities);
+		//System.out.println(cumulativeProbabilities);
+		//System.out.println("choice : " + index + " rand value  " + randVal);
+		return index;
+	}
+
+	public void processDummies() {
+		// TODO Auto-generated method stub
+		/*myData.put(Dictionnary.dummyInactiveWomen, new ArrayList<Object>());
+		myData.put(Dictionnary.dummyInactiveMen, new ArrayList<Object>());
+		
+		for(int i = 0; i < myData.get(Dictionnary.id).size(); i++){
+			//inactivewoman
+			if(myData.get(Dictionnary.sex).get(i).equals("2") &&
+					(myData.get(Dictionnary.pStatut).get(i).equals("4")||
+					myData.get(Dictionnary.pStatut).get(i).equals("7"))){
+				myData.get(Dictionnary.dummyInactiveWomen).add(1);
+			}
+			else{
+				myData.get(Dictionnary.dummyInactiveWomen).add(0);
+			}
+			//inactive men
+			if(myData.get(Dictionnary.sex).get(i).equals("1") &&
+					(myData.get(Dictionnary.pStatut).get(i).equals("4")||
+					myData.get(Dictionnary.pStatut).get(i).equals("7"))){
+				myData.get(Dictionnary.dummyInactiveMen).add(1);
+			}
+			else{
+				myData.get(Dictionnary.dummyInactiveMen).add(0);
+			}
+			
+		}*/
+	}
+	
+	public void identifyChoiceMade(HashMap<String, Integer> dictionnary, ArrayList<String> order){
+		myData.put(Dictionnary.choice, new ArrayList<Object>());
+		
+		for(int i = 0; i < myData.get(Dictionnary.id).size()-1; i++){
+			String ref = new String();
+			
+			/*if((int)myData.get(Dictionnary.nAct).get(i) == 0){
+				ref = Dictionnary.stayedHome;
+			}
+			else if(myData.get(Dictionnary.fidelPtRange).get(i).equals("0")||myData.get(Dictionnary.fidelPtRange).get(i).equals("10")){
+				ref = Dictionnary.noPT;
+			}
+			else{
+				Iterator<String> it = order.iterator();
+				while(it.hasNext()){
+					String curr = it.next();
+					ref+=myData.get(curr).get(i);
+				}
+			}*/
+			
+			Iterator<String> it = order.iterator();
+			while(it.hasNext()){
+				String curr = it.next();
+				ref+=myData.get(curr).get(i);
+			}
+			
+			String choice = Integer.toString(dictionnary.get(ref));
+			myData.get(Dictionnary.choice).add(choice);
+			
+		}
+	}
 	
 	private static class processChoiceSet
     implements Callable, Runnable {
@@ -438,7 +546,7 @@ public class DataPreparator {
     	}
     	
         public HashMap<String, ArrayList<Object>> call()  throws Exception {
-   		    processAlternatives();
+        	generateChoiceSetBySamplingClosestAlternatives( );
         	return currData;
         }
         
@@ -449,8 +557,8 @@ public class DataPreparator {
 		}
 	
 	
-		public void processAlternatives( ){
-			for(int i = 0; i < n; i++){
+		public void generateChoiceSetBySamplingClosestAlternatives( ){
+			/*for(int i = 0; i < n; i++){
 				currData.put(Dictionnary.firstDep + "Short" +Integer.toString(i), new ArrayList<Object>());
 				currData.put(Dictionnary.lastDep + "Short"+ Integer.toString(i), new ArrayList<Object>());
 				currData.put(Dictionnary.fidelPtRange+Integer.toString(i), new ArrayList<Object>());
@@ -477,10 +585,10 @@ public class DataPreparator {
 				if(i%1000==0){
 					System.out.println(i);
 				}
-			}
+			}*/
 		}
 	
-		private void addAlternatives() {
+		/*private void addAlternatives() {
 			// TODO Auto-generated method stub
 			for(int i = 0; i < n; i++){
 				currData.get(Dictionnary.firstDep + "Short"+ Integer.toString(i)).add("0");
@@ -559,117 +667,6 @@ public class DataPreparator {
 			answer[0] = curId;
 			answer[1] = curDist;
 			return answer;
-		}
-	}
-	
-	
-	public void departureHour3categories(){
-		myData.put(Dictionnary.firstDep + "Short", new ArrayList());
-		for(int i = 0; i < myData.get(Dictionnary.id).size(); i++){
-			String temp = (String) myData.get(Dictionnary.firstDep).get(i);
-			if(temp.equals("1")){myData.get(Dictionnary.firstDep+ "Short").add("0");} //living earlier then peak hour
-			else if (temp.equals("2")){myData.get(Dictionnary.firstDep+ "Short").add("1");} // leaving during peak hour (6-9am)
-			else if (temp.equals("10")){myData.get(Dictionnary.firstDep+ "Short").add("10");}
-			else {myData.get(Dictionnary.firstDep+ "Short").add("2");} 
-		}
-	}
-	
-	public void lastDepartureHour3categories(){
-		myData.put(Dictionnary.lastDep + "Short", new ArrayList());
-		
-		for(int i = 0; i < myData.get(Dictionnary.id).size(); i++){
-			int hour = Integer.parseInt((String)myData.get(Dictionnary.lastDep).get(i));
-			if(hour<1530){myData.get(Dictionnary.lastDep+ "Short").add("0");}
-			else if(hour < 1830){myData.get(Dictionnary.lastDep+ "Short").add("1");}
-			else if (hour >=1830){myData.get(Dictionnary.lastDep+ "Short").add("2");}
-			else{myData.get(Dictionnary.lastDep + "Short").add("10");}
-		}
-	}
-
-	
-	
-	
-	public int antitheticDrawMNL(ArrayList<Double> utilities){
-		ArrayList<Double> exponentials = new ArrayList<Double>();
-		double denominator = 0;
-		for(Double u : utilities){
-			double expU = Math.exp(u);
-			exponentials.add(expU);
-			denominator += expU;
-		}
-		ArrayList<Double> cumulativeProbabilities = new ArrayList<Double>();
-		double cumul = 0;
-		for(Double eU : exponentials){
-			cumul += eU;
-			cumulativeProbabilities.add(cumul/denominator);
-		}
-		
-		double randVal = randGen.NextDoubleInRange(0, 1);
-		int index =0;
-		for(int i =0; i<cumulativeProbabilities.size(); i++){
-			if(randVal>cumulativeProbabilities.get(i)){
-			}
-			else{
-				index = i;
-				i+=1000;
-			}
-		}
-		//System.out.println(utilities);
-		//System.out.println(cumulativeProbabilities);
-		//System.out.println("choice : " + index + " rand value  " + randVal);
-		return index;
-	}
-
-	public void processDummies() {
-		// TODO Auto-generated method stub
-		myData.put(Dictionnary.dummyInactiveWomen, new ArrayList<Object>());
-		myData.put(Dictionnary.dummyInactiveMen, new ArrayList<Object>());
-		
-		for(int i = 0; i < myData.get(Dictionnary.id).size(); i++){
-			//inactivewoman
-			if(myData.get(Dictionnary.sex).get(i).equals("2") &&
-					(myData.get(Dictionnary.pStatut).get(i).equals("4")||
-					myData.get(Dictionnary.pStatut).get(i).equals("7"))){
-				myData.get(Dictionnary.dummyInactiveWomen).add(1);
-			}
-			else{
-				myData.get(Dictionnary.dummyInactiveWomen).add(0);
-			}
-			//inactive men
-			if(myData.get(Dictionnary.sex).get(i).equals("1") &&
-					(myData.get(Dictionnary.pStatut).get(i).equals("4")||
-					myData.get(Dictionnary.pStatut).get(i).equals("7"))){
-				myData.get(Dictionnary.dummyInactiveMen).add(1);
-			}
-			else{
-				myData.get(Dictionnary.dummyInactiveMen).add(0);
-			}
-			
-		}
-	}
-	
-	public void processChoice(HashMap<String, Integer> dictionnary, ArrayList<String> order){
-		myData.put(Dictionnary.choice, new ArrayList<Object>());
-		
-		for(int i = 0; i < myData.get(Dictionnary.id).size()-1; i++){
-			String ref = new String();
-			
-			if((int)myData.get(Dictionnary.nAct).get(i) == 0){
-				ref = Dictionnary.stayedHome;
-			}
-			else if(myData.get(Dictionnary.fidelPtRange).get(i).equals("0")||myData.get(Dictionnary.fidelPtRange).get(i).equals("10")){
-				ref = Dictionnary.noPT;
-			}
-			else{
-				Iterator<String> it = order.iterator();
-				while(it.hasNext()){
-					String curr = it.next();
-					ref+=myData.get(curr).get(i);
-				}
-			}
-			String choice = Integer.toString(dictionnary.get(ref));
-			myData.get(Dictionnary.choice).add(choice);
-			
-		}
+		}*/
 	}
 }

@@ -21,9 +21,6 @@ import Utils.Writer;
  */
 
 
-
-
-
 public class ControlFileGenerator {
 	/**
 	 * 
