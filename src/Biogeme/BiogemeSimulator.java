@@ -17,7 +17,7 @@ import Utils.Utils;
  */
 public class BiogemeSimulator {
 
-	public BiogemeControlFileGenerator biogemeGenerator = new BiogemeControlFileGenerator();
+	public BiogemeControlFileGenerator myCtrlGen;
 	
 	Reader myReader = new Reader();
 	Writer myOutputFileWriter = new Writer();
@@ -28,15 +28,19 @@ public class BiogemeSimulator {
 	}
 	
 	public BiogemeSimulator(String pathControleFile, String pathOutput, String pathHypothesis) throws IOException{
-		biogemeGenerator.generateBiogemeControlFile();
-		biogemeGenerator.initialize(pathControleFile, pathOutput, pathHypothesis);
+		myCtrlGen.generateBiogemeControlFile();
+		myCtrlGen.initialize(pathControleFile, pathOutput, pathHypothesis);
+	}
+	
+	public BiogemeSimulator(BiogemeControlFileGenerator ctrlGen){
+		myCtrlGen = ctrlGen;
 	}
 	
 	public void initialize(String path ) throws IOException{
 		myReader.OpenFile(path);
 		createAgents();
 		System.out.println("--agents created");
-		addHypothesis(biogemeGenerator.hypothesis);
+		addHypothesis(myCtrlGen.hypothesis);
 		ArrayList<BiogemeHypothesis> constants = generateConstantHypothesis();
 		addHypothesis(constants);
 	}
@@ -60,10 +64,16 @@ public class BiogemeSimulator {
 	}
 
 	public void applyModelOnTravelSurveyPopulation(String outputPath) throws IOException{
+		int n = 0;
+		int N = myPopulationSample.size();
 		for(BiogemeAgent person: myPopulationSample){
 			ArrayList<Integer> choiceSet = person.processChoiceSet();
 			//System.out.println(choiceSet);
 			person.applyModel(choiceSet);
+			n++;
+			if(n%1000 == 0){
+				System.out.println("-- " + n + " agents were processed out of " + N);
+			}
 		}
 		
 		myOutputFileWriter.OpenFile(outputPath);
@@ -71,7 +81,7 @@ public class BiogemeSimulator {
 		myOutputFileWriter.WriteToFile(headers);
 		for(BiogemeAgent person: myPopulationSample){
 			
-			for(BiogemeChoice temp: biogemeGenerator.choiceIndex){
+			for(BiogemeChoice temp: myCtrlGen.choiceIndex){
 				if(temp.biogeme_id == Integer.parseInt(person.myAttributes.get(Utils.sim))){
 					
 				}
@@ -91,7 +101,7 @@ public class BiogemeSimulator {
 
 	private String getChoice(String string) {
 		// TODO Auto-generated method stub
-		for(BiogemeChoice temp: biogemeGenerator.choiceIndex){
+		for(BiogemeChoice temp: myCtrlGen.choiceIndex){
 			if(temp.biogeme_id == Integer.parseInt(string)){
 				return temp.getConstantName();
 			}

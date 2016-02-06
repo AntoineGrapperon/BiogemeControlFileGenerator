@@ -52,7 +52,7 @@ public class BiogemeControlFileGenerator {
 		  BiogemeHypothesis currHypothesis = new BiogemeHypothesis();
 		  
 		  
-		  boolean isDummy = tok[3].equals("dummy");
+		  boolean isDummy = tok[3].trim().equals("dummy");
 		  currHypothesis.isDummy = isDummy;
 		  String coefName = tok[0];
 		  currHypothesis.setCoefName(coefName);
