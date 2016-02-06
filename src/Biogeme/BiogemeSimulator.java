@@ -72,17 +72,17 @@ public class BiogemeSimulator {
 		for(BiogemeAgent person: myPopulationSample){
 			
 			for(BiogemeChoice temp: biogemeGenerator.choiceIndex){
-				if(temp.biogeme_id == Integer.parseInt(person.myAttributes.get(UtilsTS.sim))){
+				if(temp.biogeme_id == Integer.parseInt(person.myAttributes.get(Utils.sim))){
 					
 				}
 			}
 			
-			String newLine = getChoice(person.myAttributes.get(UtilsTS.alternative)) + 
-					Utils.COLUMN_DELIMETER +getChoice(person.myAttributes.get(UtilsTS.sim)) +
-					Utils.COLUMN_DELIMETER + person.myAttributes.get(UtilsTS.weigth);
-			/*String newLine = person.myAttributes.get(UtilsTS.alternative) + 
-					Utils.COLUMN_DELIMETER + person.myAttributes.get(UtilsTS.sim) +
-					Utils.COLUMN_DELIMETER + person.myAttributes.get(UtilsTS.weigth);*/
+			String newLine = getChoice(person.myAttributes.get(Utils.alternative)) + 
+					Utils.COLUMN_DELIMETER +getChoice(person.myAttributes.get(Utils.sim)) +
+					Utils.COLUMN_DELIMETER + person.myAttributes.get(Utils.weigth);
+			/*String newLine = person.myAttributes.get(Utils.alternative) + 
+					Utils.COLUMN_DELIMETER + person.myAttributes.get(Utils.sim) +
+					Utils.COLUMN_DELIMETER + person.myAttributes.get(Utils.weigth);*/
 			myOutputFileWriter.WriteToFile(newLine);
 		}
 		myOutputFileWriter.CloseFile();

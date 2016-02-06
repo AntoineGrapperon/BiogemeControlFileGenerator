@@ -51,4 +51,14 @@ public class BiogemeHypothesis {
 				+ affectingCategories +  Utils.Utils.COLUMN_DELIMETER ;			
 		return answer;
 	}
+	
+	public boolean isCst() {
+		// TODO Auto-generated method stub
+		for(BiogemeChoice currChoice: BiogemeControlFileGenerator.choiceIndex){
+			if(this.coefName.equals(currChoice.getConstantName())){
+				return true;
+			}
+		}
+		return false;
+	}
 }

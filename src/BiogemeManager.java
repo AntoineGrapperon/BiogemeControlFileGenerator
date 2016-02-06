@@ -1,7 +1,7 @@
 import java.io.IOException;
 
-import Biogeme.ControlFileGenerator;
-import Utils.Dictionnary;
+import Biogeme.BiogemeControlFileGenerator;
+import Utils.Utils;
 
 /**
  * The Control File Generator for Biogeme project was made to generate control file for the open source software BIOGEME.
@@ -15,7 +15,7 @@ import Utils.Dictionnary;
  * @author Antoine
  *
  */
-public class Main {
+public class BiogemeManager {
 
 	/**
 	 * @param args
@@ -24,16 +24,22 @@ public class Main {
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		ControlFileGenerator biogeme;
-		biogeme = new ControlFileGenerator();
-		String pathControlFile =Dictionnary.WRK_DIR + "\\ctrl\\biogeme_ctrl_file.txt";
-		String pathOutput = Dictionnary.WRK_DIR + "\\biogeme\\test.mod";
-		String pathHypothesis = Dictionnary.WRK_DIR + "\\ctrl\\biogeme_hypothesis_desc.txt";
+		
+		long startTime = System.currentTimeMillis();
+		BiogemeControlFileGenerator ctrlGenerator;
+		ctrlGenerator = new BiogemeControlFileGenerator();
+		String pathControlFile =Utils.WRK_DIR + "test\\biogeme_ctrl_file.txt";
+		String pathOutput = Utils.WRK_DIR + "test\\test.mod";
+		String pathHypothesis = Utils.WRK_DIR + "test\\biogeme_hypothesis_desc.txt";
 		try {
-			biogeme.generateBiogemeControlFile(pathControlFile, pathOutput, pathHypothesis);
+			ctrlGenerator.initialize(pathControlFile, pathOutput, pathHypothesis);
+			ctrlGenerator.generateBiogemeControlFile();
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		long endTime = System.currentTimeMillis();
+		System.out.println("--process ended: "+ (endTime-startTime) + "ms");
 	}
 }

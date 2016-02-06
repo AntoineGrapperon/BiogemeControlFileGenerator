@@ -5,6 +5,7 @@ package Biogeme;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import Utils.Utils;
 
 /**
  * @author Antoine
@@ -53,14 +54,14 @@ public class BiogemeChoice {
 		return false;
 	}
 	
-	public boolean isCst(BiogemeHypothesis currH){
+	/*public boolean isCst(BiogemeHypothesis currH){
 		// TODO Auto-generated method stub
 		if(currH.coefName.equals(getConstantName())){
 			return true;
 		}
 		
 		return false;
-	}
+	}*/
 
 	public double getAffectingValue(BiogemeHypothesis currH, BiogemeAgent currAgent) {
 		// TODO Auto-generated method stub
@@ -78,13 +79,13 @@ public class BiogemeChoice {
 	public String getConstantName(){
 		String constantName = new String();
 		
-		if(choiceCombination.get(UtilsTS.nAct) == 0){
+		if(choiceCombination.get(Utils.nAct) == 0){
 			constantName = "C_HOME";
 		}
-		else if(choiceCombination.get(UtilsTS.nAct)!= 0 && choiceCombination.get(UtilsTS.fidelPtRange)==0){
+		else if(choiceCombination.get(Utils.nAct)!= 0 && choiceCombination.get(Utils.fidelPtRange)==0){
 			constantName = "C_NOT_PT_RIDER";
 		}
-		else if(choiceCombination.get(UtilsTS.nAct)!=0 && choiceCombination.get(UtilsTS.fidelPtRange)!=0){
+		else if(choiceCombination.get(Utils.nAct)!=0 && choiceCombination.get(Utils.fidelPtRange)!=0){
 			constantName = "C";
 			for(String key: choiceCombination.keySet()){
 				constantName+= "_"+choiceCombination.get(key);
@@ -96,7 +97,7 @@ public class BiogemeChoice {
 	public String toString(){
 		String answer = Integer.toString(biogeme_id);
 		for(String key: choiceCombination.keySet()){
-			answer+= Utils.Utils.COLUMN_DELIMETER + key + Utils.Utils.COLUMN_DELIMETER + choiceCombination.get(key);
+			answer+= Utils.COLUMN_DELIMETER + key + Utils.COLUMN_DELIMETER + choiceCombination.get(key);
 		}
 		return answer;
 	}

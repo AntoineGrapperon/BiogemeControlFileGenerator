@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import Utils.RandomNumberGen;
+import Utils.Utils;
 
 /**
  * @author Antoine
@@ -38,7 +39,7 @@ public class BiogemeAgent {
 			BiogemeChoice currChoice =BiogemeControlFileGenerator.choiceIndex.get(choiceSet.get(i));
 			
 			for(BiogemeHypothesis currH: BiogemeSimulator.modelHypothesis){
-				if(isCst(currH)){
+				if(currH.isCst()){
 					utility += currH.getCoefficientValue();
 				}
 				else if(currChoice.isAffected(currH) && currChoice.isAffecting(currH, this) && currH.isDummy){
@@ -53,10 +54,10 @@ public class BiogemeAgent {
 		
 		ArrayList<Double> cumProbabilities = processUtilities(utilities);
 		int choiceIndex = antitheticDraw(cumProbabilities);
-		myAttributes.put(UtilsTS.sim, Integer.toString(choiceSet.get(choiceIndex)));
+		myAttributes.put(Utils.sim, Integer.toString(choiceSet.get(choiceIndex)));
 	}
 
-	private boolean isCst(BiogemeHypothesis currH) {
+	/*private boolean isCst(BiogemeHypothesis currH) {
 		// TODO Auto-generated method stub
 		for(BiogemeChoice currChoice: BiogemeControlFileGenerator.choiceIndex){
 			if(currChoice.isCst(currH)){
@@ -64,7 +65,7 @@ public class BiogemeAgent {
 			}
 		}
 		return false;
-	}
+	}*/
 
 	private ArrayList<Double> processUtilities(ArrayList<Double> utilities) {
 		// TODO Auto-generated method stub
@@ -88,7 +89,7 @@ public class BiogemeAgent {
 		for(String header: myAttributes.keySet()){
 			//System.out.println(header);
 			//System.out.println(header);
-			if(header.contains(UtilsTS.alternative)){
+			if(header.contains(Utils.alternative)){
 				choiceSet.add(Integer.parseInt(myAttributes.get(header)));
 			}
 		}
