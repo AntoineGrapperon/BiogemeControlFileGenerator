@@ -24,7 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 //import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry.Entry;
 
-import Utils.Dictionnary;
+import Utils.Utils;
 import Utils.RandomNumberGen;
 import Utils.Reader;
 import Utils.Writer;
@@ -230,15 +230,15 @@ public class DataPreparator {
 
 		String headers= new String();
 		for (String key : myData.keySet()) {
-			headers+= key + Dictionnary.COLUMN_DELIMETER;
+			headers+= key + Utils.COLUMN_DELIMETER;
 		}
 		headers = headers.substring(0, headers.length()-1);
 		myOutputFileWritter.WriteToFile(headers);
 		
-		for(int i=0; i < myData.get(Dictionnary.id).size(); i++){
+		for(int i=0; i < myData.get(Utils.id).size(); i++){
 			String line = new String();
 			for(String key: myData.keySet()){
-				line += myData.get(key).get(i) + Dictionnary.COLUMN_DELIMETER;
+				line += myData.get(key).get(i) + Utils.COLUMN_DELIMETER;
 			}
 			line = line.substring(0, line.length()-1);
 			myOutputFileWritter.WriteToFile(line);
@@ -252,19 +252,19 @@ public class DataPreparator {
 		Iterator<String> it = toPrint.iterator();
 		while(it.hasNext()){
 			String head = it.next();
-			headers+= head + Dictionnary.COLUMN_DELIMETER;
+			headers+= head + Utils.COLUMN_DELIMETER;
 		}
 		headers = headers.substring(0, headers.length()-1);
 		myOutputFileWritter.WriteToFile(headers);
 		
-		for(int i=0; i < myData.get(Dictionnary.id).size()-1; i++){
-			if(myData.get(Dictionnary.pDebut).get(i).equals("1")){
+		for(int i=0; i < myData.get(Utils.id).size()-1; i++){
+			if(myData.get(Utils.pDebut).get(i).equals("1")){
 				String line = new String();
 				Iterator<String> it2 = toPrint.iterator();
 				while(it2.hasNext()){
 					String head = it2.next();
 					try{
-						line += myData.get(head).get(i) + Dictionnary.COLUMN_DELIMETER;
+						line += myData.get(head).get(i) + Utils.COLUMN_DELIMETER;
 					}
 					catch(NullPointerException ex){
 						System.out.println("null pointer exception : " + head);
@@ -281,28 +281,28 @@ public class DataPreparator {
 	
 	public void selectAndPrint(int choiceSetSize){
 		ArrayList<String> headers = new ArrayList<String>();
-		headers.add(Dictionnary.id);
-		headers.add(Dictionnary.pDebut);
-		headers.add(Dictionnary.sex);
-		headers.add(Dictionnary.ageGroup);
-		headers.add(Dictionnary.firstDep + "Short");//FIRST departure
-		headers.add(Dictionnary.lastDep + "Short");
-		headers.add(Dictionnary.firstDep);//FIRST departure
-		headers.add(Dictionnary.lastDep);
-		headers.add(Dictionnary.fidelPtRange);
-		headers.add(Dictionnary.nAct);
+		headers.add(Utils.id);
+		headers.add(Utils.pDebut);
+		headers.add(Utils.sex);
+		headers.add(Utils.ageGroup);
+		headers.add(Utils.firstDep + "Short");//FIRST departure
+		headers.add(Utils.lastDep + "Short");
+		headers.add(Utils.firstDep);//FIRST departure
+		headers.add(Utils.lastDep);
+		headers.add(Utils.fidelPtRange);
+		headers.add(Utils.nAct);
 		for(int i = 0; i < choiceSetSize; i++){
-			headers.add(Dictionnary.firstDep + "Short" +Integer.toString(i));
-			headers.add(Dictionnary.lastDep + "Short" +Integer.toString(i));
-			headers.add(Dictionnary.fidelPtRange+Integer.toString(i));
-			headers.add(Dictionnary.nAct+Integer.toString(i));
+			headers.add(Utils.firstDep + "Short" +Integer.toString(i));
+			headers.add(Utils.lastDep + "Short" +Integer.toString(i));
+			headers.add(Utils.fidelPtRange+Integer.toString(i));
+			headers.add(Utils.nAct+Integer.toString(i));
 		}
-		/*headers.add(Dictionnary.sim + Dictionnary.nAct);
-		headers.add(Dictionnary.sim + Dictionnary.fidelPtRange);
-		headers.add(Dictionnary.sim + Dictionnary.firstDep);
-		headers.add(Dictionnary.sim + Dictionnary.lastDep);*/
+		/*headers.add(Utils.sim + Utils.nAct);
+		headers.add(Utils.sim + Utils.fidelPtRange);
+		headers.add(Utils.sim + Utils.firstDep);
+		headers.add(Utils.sim + Utils.lastDep);*/
 		
-		headers.add(Dictionnary.choice);
+		headers.add(Utils.choice);
 		
 		try {
 			printColumns(headers);
@@ -321,7 +321,7 @@ public class DataPreparator {
 	 */
 	public ArrayList<Object> createSubSamples(int numberOfCores){
 
-	    int subSampleSize = myData.get(Dictionnary.id).size()/(numberOfCores);
+	    int subSampleSize = myData.get(Utils.id).size()/(numberOfCores);
 	    ArrayList<Object> subSamples = new ArrayList<Object>();
 	    int idxCore = 0;
 	    
@@ -333,8 +333,8 @@ public class DataPreparator {
 	    	subSamples.add(currSubSample);
 	    }
 	    
-	    System.out.println(myData.get(Dictionnary.id).size());
-	    for(int k = 0; k < myData.get(Dictionnary.id).size()-1; k++){
+	    System.out.println(myData.get(Utils.id).size());
+	    for(int k = 0; k < myData.get(Utils.id).size()-1; k++){
 	    	if((k>=idxCore*subSampleSize && k < (idxCore+1)*subSampleSize)|| (k>=idxCore*subSampleSize && idxCore == numberOfCores-1)){// || (k>=i*subSampleSize && i == numberOfCores-1)
 	    		for (String key: myData.keySet()){
 	    			//System.out.println(key + "  "+ idxCore + "  " + k);
@@ -353,7 +353,7 @@ public class DataPreparator {
 	    	}
 	    }
 	    for (int j = 0; j<numberOfCores; j++){
-	    	int size = ((HashMap<String, ArrayList<Object>>) subSamples.get(j)).get(Dictionnary.id).size();
+	    	int size = ((HashMap<String, ArrayList<Object>>) subSamples.get(j)).get(Utils.id).size();
 	    	System.out.println("sample " + j + ": " + size);	
 	    }
 	    return subSamples;
@@ -366,7 +366,7 @@ public class DataPreparator {
 		ControlFileGenerator biogemeGenerator = new ControlFileGenerator();
     	biogemeGenerator.initialize(pathControleFile, pathOutput, pathHypothesis);
     	biogemeGenerator.generateCombinations();
-    	HashMap<String,Integer> dictionnary = biogemeGenerator.getCombinationTable();
+    	HashMap<String,Integer> index = biogemeGenerator.getCombinationTable();
     	
 		storeData();
 
@@ -375,7 +375,7 @@ public class DataPreparator {
 		//departureHour3categories();
 		//lastDepartureHour3categories();
 		
-		identifyChoiceMade(dictionnary, biogemeGenerator.order);
+		identifyChoiceMade(index, biogemeGenerator.order);
 		
 		processDummies();
 		
@@ -420,25 +420,25 @@ public class DataPreparator {
 	
 	
 	/*public void departureHour3categories(){
-		myData.put(Dictionnary.firstDep + "Short", new ArrayList());
-		for(int i = 0; i < myData.get(Dictionnary.id).size(); i++){
-			String temp = (String) myData.get(Dictionnary.firstDep).get(i);
-			if(temp.equals("1")){myData.get(Dictionnary.firstDep+ "Short").add("0");} //living earlier then peak hour
-			else if (temp.equals("2")){myData.get(Dictionnary.firstDep+ "Short").add("1");} // leaving during peak hour (6-9am)
-			else if (temp.equals("10")){myData.get(Dictionnary.firstDep+ "Short").add("10");}
-			else {myData.get(Dictionnary.firstDep+ "Short").add("2");} 
+		myData.put(Index.firstDep + "Short", new ArrayList());
+		for(int i = 0; i < myData.get(Index.id).size(); i++){
+			String temp = (String) myData.get(Index.firstDep).get(i);
+			if(temp.equals("1")){myData.get(Index.firstDep+ "Short").add("0");} //living earlier then peak hour
+			else if (temp.equals("2")){myData.get(Index.firstDep+ "Short").add("1");} // leaving during peak hour (6-9am)
+			else if (temp.equals("10")){myData.get(Index.firstDep+ "Short").add("10");}
+			else {myData.get(Index.firstDep+ "Short").add("2");} 
 		}
 	}
 	
 	public void lastDepartureHour3categories(){
-		myData.put(Dictionnary.lastDep + "Short", new ArrayList());
+		myData.put(Index.lastDep + "Short", new ArrayList());
 		
-		for(int i = 0; i < myData.get(Dictionnary.id).size(); i++){
-			int hour = Integer.parseInt((String)myData.get(Dictionnary.lastDep).get(i));
-			if(hour<1530){myData.get(Dictionnary.lastDep+ "Short").add("0");}
-			else if(hour < 1830){myData.get(Dictionnary.lastDep+ "Short").add("1");}
-			else if (hour >=1830){myData.get(Dictionnary.lastDep+ "Short").add("2");}
-			else{myData.get(Dictionnary.lastDep + "Short").add("10");}
+		for(int i = 0; i < myData.get(Index.id).size(); i++){
+			int hour = Integer.parseInt((String)myData.get(Index.lastDep).get(i));
+			if(hour<1530){myData.get(Index.lastDep+ "Short").add("0");}
+			else if(hour < 1830){myData.get(Index.lastDep+ "Short").add("1");}
+			else if (hour >=1830){myData.get(Index.lastDep+ "Short").add("2");}
+			else{myData.get(Utils.lastDep + "Short").add("10");}
 		}
 	}*/
 
@@ -478,43 +478,43 @@ public class DataPreparator {
 
 	public void processDummies() {
 		// TODO Auto-generated method stub
-		/*myData.put(Dictionnary.dummyInactiveWomen, new ArrayList<Object>());
-		myData.put(Dictionnary.dummyInactiveMen, new ArrayList<Object>());
+		/*myData.put(Utils.dummyInactiveWomen, new ArrayList<Object>());
+		myData.put(Utils.dummyInactiveMen, new ArrayList<Object>());
 		
-		for(int i = 0; i < myData.get(Dictionnary.id).size(); i++){
+		for(int i = 0; i < myData.get(Utils.id).size(); i++){
 			//inactivewoman
-			if(myData.get(Dictionnary.sex).get(i).equals("2") &&
-					(myData.get(Dictionnary.pStatut).get(i).equals("4")||
-					myData.get(Dictionnary.pStatut).get(i).equals("7"))){
-				myData.get(Dictionnary.dummyInactiveWomen).add(1);
+			if(myData.get(Utils.sex).get(i).equals("2") &&
+					(myData.get(Utils.pStatut).get(i).equals("4")||
+					myData.get(Utils.pStatut).get(i).equals("7"))){
+				myData.get(Utils.dummyInactiveWomen).add(1);
 			}
 			else{
-				myData.get(Dictionnary.dummyInactiveWomen).add(0);
+				myData.get(Utils.dummyInactiveWomen).add(0);
 			}
 			//inactive men
-			if(myData.get(Dictionnary.sex).get(i).equals("1") &&
-					(myData.get(Dictionnary.pStatut).get(i).equals("4")||
-					myData.get(Dictionnary.pStatut).get(i).equals("7"))){
-				myData.get(Dictionnary.dummyInactiveMen).add(1);
+			if(myData.get(Utils.sex).get(i).equals("1") &&
+					(myData.get(Utils.pStatut).get(i).equals("4")||
+					myData.get(Utils.pStatut).get(i).equals("7"))){
+				myData.get(Utils.dummyInactiveMen).add(1);
 			}
 			else{
-				myData.get(Dictionnary.dummyInactiveMen).add(0);
+				myData.get(Utils.dummyInactiveMen).add(0);
 			}
 			
 		}*/
 	}
 	
-	public void identifyChoiceMade(HashMap<String, Integer> dictionnary, ArrayList<String> order){
-		myData.put(Dictionnary.choice, new ArrayList<Object>());
+	public void identifyChoiceMade(HashMap<String, Integer> index, ArrayList<String> order){
+		myData.put(Utils.choice, new ArrayList<Object>());
 		
-		for(int i = 0; i < myData.get(Dictionnary.id).size()-1; i++){
+		for(int i = 0; i < myData.get(Utils.id).size()-1; i++){
 			String ref = new String();
 			
-			/*if((int)myData.get(Dictionnary.nAct).get(i) == 0){
-				ref = Dictionnary.stayedHome;
+			/*if((int)myData.get(Utils.nAct).get(i) == 0){
+				ref = Utils.stayedHome;
 			}
-			else if(myData.get(Dictionnary.fidelPtRange).get(i).equals("0")||myData.get(Dictionnary.fidelPtRange).get(i).equals("10")){
-				ref = Dictionnary.noPT;
+			else if(myData.get(Utils.fidelPtRange).get(i).equals("0")||myData.get(Utils.fidelPtRange).get(i).equals("10")){
+				ref = Utils.noPT;
 			}
 			else{
 				Iterator<String> it = order.iterator();
@@ -530,8 +530,8 @@ public class DataPreparator {
 				ref+=myData.get(curr).get(i);
 			}
 			
-			String choice = Integer.toString(dictionnary.get(ref));
-			myData.get(Dictionnary.choice).add(choice);
+			String choice = Integer.toString(index.get(ref));
+			myData.get(Utils.choice).add(choice);
 			
 		}
 	}

@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,4 +46,17 @@ public class Reader {
    {
        return myFileReader.readLine();
    }
+   
+   public ArrayList<String> StoreLineByLine() throws IOException
+   {
+   	String str;
+       ArrayList<String> Line = new ArrayList<String>();
+       	
+       while ((str = myFileReader.readLine()) != null) 
+       {
+       	Line.add(str);
+       }
+       myFileReader.close();
+       return Line;
+    }
 }

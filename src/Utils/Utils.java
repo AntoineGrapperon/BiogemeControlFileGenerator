@@ -7,7 +7,7 @@ package Utils;
  * @author Antoine
  *
  */
-public class Dictionnary {
+public class Utils {
 
     
 	
