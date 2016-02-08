@@ -138,48 +138,7 @@ public class BiogemeControlFileGenerator {
     			myDataWriter.WriteToFile(choiceName + " 	    0.0          -10.0     10.0         0");	
     		}
     	}
-    	
-    	/*
-    	Iterator<HashMap<String,Integer>> it = combinations.iterator();
-		while(it.hasNext()){
-			
-			HashMap<String,Integer> currCombination = it.next();
-			String output = new String();
-			String testhead = new String();
-			
-			if(!first){
-				for(String key: currCombination.keySet()){
-					testhead += " - " + key;
-					order.add(key);
-				}
-				myDataWriter.WriteToFile("// " + testhead);
-				first = true;
-			}
-			
-			if(shouldWrite(currCombination, home, ptUser)){
-				for(String key: currCombination.keySet()){
-					output+= "_"+currCombination.get(key);
-				}
-				myDataWriter.WriteToFile("C" + output + " 	    0.0          -10.0     10.0         0");	
-			}
-		}*/
     }
-    
-    /*private boolean shouldWrite(HashMap<String, Integer> currCombination, String home, String ptUser){
-    	boolean answer = false;
-    	if(currCombination.get(Utils.nAct) == 0 && home.equals("0")){
-			home = "1";
-			answer = true;
-		}
-		else if(currCombination.get(Utils.nAct)!= 0 && currCombination.get(Utils.fidelPtRange)==0 && ptUser.equals("0")){
-			ptUser = "1";
-			answer = true;
-		}
-		else if(currCombination.get(Utils.nAct)!=0 && currCombination.get(Utils.fidelPtRange)!=0){
-			answer = true;
-		}
-    	return answer;
-    }*/
     
     public void writeHypothesisBeta() throws IOException{
     	for(BiogemeHypothesis h: hypothesis){
@@ -233,8 +192,6 @@ public class BiogemeControlFileGenerator {
     		String affectedDim = e.affectedDimensionName;
     		ArrayList<Integer> affectedCategories = e.affectedCategories;
     		boolean requiresCoefficient = false;
-    		//System.out.println(affectedDim);
-    		//System.out.println(currCombination.toString());
     		int category = currCombination.get(affectedDim);
     		for(int i: affectedCategories){
     			if(i == category){
@@ -371,9 +328,7 @@ public class BiogemeControlFileGenerator {
     	myDataWriter.WriteToFile("EARLY_WORKER_var = (OCCUP == 0 ) * (FIRST_DEPShort * 0 )");
     	myDataWriter.WriteToFile("RETIRE_FIRST_DEP_var = (OCCUP == 2 ) * (FIRST_DEPShort * 2 )");
     	myDataWriter.WriteToFile("[Exclude]");
-    	myDataWriter.WriteToFile("(GRPAGE == 0) >= 1");
-    			
-    	//myDataWriter.WriteToFile("((P_GRAGE == 1) + (P_STATUT == 6) + (P_STATUT == 8) + (P_STATUT == 5) + (N_ACT == 0))  >= 1  //+ ((P_STATUT != 1) + (P_STATUT != 2)) / 2)");
+    	myDataWriter.WriteToFile("(GRPAGE == 0) >= 1");		
     	myDataWriter.WriteToFile("[Model]");
     	myDataWriter.WriteToFile("$MNL");
     }
@@ -386,5 +341,19 @@ public class BiogemeControlFileGenerator {
 			tempWriter.WriteToFile(c.toString());
 		}
 		tempWriter.CloseFile();
+	}
+	
+	private void writeDummies() throws IOException {
+		// TODO Auto-generated method stub
+		for(BiogemeHypothesis currH : hypothesis){
+			if(currH.isDummy){
+				String newExpression = currH.affectingDimensionName + Utils.var + " = ";
+				for(int i : currH.affectingCategories){
+					newExpression+= " (" + currH.affectingDimensionName + " == " + i + " ) *";
+				}
+				newExpression = newExpression.trim().substring(0, newExpression.length() -1);
+				myDataWriter.WriteToFile(newExpression);
+			}
+		}
 	}
 }

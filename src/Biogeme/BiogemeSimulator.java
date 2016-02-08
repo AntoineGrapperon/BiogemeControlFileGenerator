@@ -5,7 +5,9 @@ package Biogeme;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Scanner;
+
 
 import Utils.Reader;
 import Utils.Writer;
@@ -188,4 +190,35 @@ public class BiogemeSimulator {
 		tempWriter.CloseFile();
 	}
 	
+public void writeSimulationResults() throws IOException {
+		
+		printHeaders();
+		Iterator<BiogemeAgent> it = myPopulationSample.iterator();
+		while(it.hasNext()){
+			BiogemeAgent currAgent = it.next();
+			printAgent(currAgent);
+		}
+		myOutputFileWriter.CloseFile();
+	}
+	
+	private void printAgent(BiogemeAgent currAgent) throws IOException {
+		// TODO Auto-generated method stub
+		String newLine = new String();
+		for(String header: currAgent.myAttributes.keySet()){
+			newLine += currAgent.myAttributes.get(header) + Utils.COLUMN_DELIMETER;
+		}
+		newLine += getChoice(currAgent.myAttributes.get(Utils.alternative)) + 
+				Utils.COLUMN_DELIMETER +getChoice(currAgent.myAttributes.get(Utils.sim)) ;
+		myOutputFileWriter.WriteToFile(newLine);
+	}
+
+	private void printHeaders() throws IOException {
+		// TODO Auto-generated method stub
+		String headers = new String();
+		for(String header: myPopulationSample.get(0).myAttributes.keySet()){
+			headers += header + Utils.COLUMN_DELIMETER;
+		}
+		headers += headers + Utils.alternative + "_DEF" + Utils.COLUMN_DELIMETER + Utils.sim + "_DEF";
+		myOutputFileWriter.WriteToFile(headers);
+	}
 }
