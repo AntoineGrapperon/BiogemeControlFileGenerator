@@ -41,7 +41,7 @@ public class BiogemeManager {
 			//AND 
 			
 			mySimulator = new BiogemeSimulator(myCtrlGenerator);
-			mySimulator.initialize( Utils.WRK_DIR + "test\\data.csv");
+			mySimulator.initialize(Utils.WRK_DIR + "test\\data.csv");
 			mySimulator.importBiogemeModel(Utils.WRK_DIR + "test\\model.F12");
 			mySimulator.applyModelOnTravelSurveyPopulation(Utils.WRK_DIR + "test\\simulationResults.csv");
 			

@@ -80,19 +80,9 @@ public class BiogemeSimulator {
 		String headers = "Observed choice, Simulated choice, Weigh";
 		myOutputFileWriter.WriteToFile(headers);
 		for(BiogemeAgent person: myPopulationSample){
-			
-			for(BiogemeChoice temp: myCtrlGen.choiceIndex){
-				if(temp.biogeme_id == Integer.parseInt(person.myAttributes.get(Utils.sim))){
-					
-				}
-			}
-			
 			String newLine = getChoice(person.myAttributes.get(Utils.alternative)) + 
 					Utils.COLUMN_DELIMETER +getChoice(person.myAttributes.get(Utils.sim)) +
 					Utils.COLUMN_DELIMETER + person.myAttributes.get(Utils.weigth);
-			/*String newLine = person.myAttributes.get(Utils.alternative) + 
-					Utils.COLUMN_DELIMETER + person.myAttributes.get(Utils.sim) +
-					Utils.COLUMN_DELIMETER + person.myAttributes.get(Utils.weigth);*/
 			myOutputFileWriter.WriteToFile(newLine);
 		}
 		myOutputFileWriter.CloseFile();
